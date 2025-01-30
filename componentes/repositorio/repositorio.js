@@ -1,48 +1,64 @@
-var repositorioactivo = 0;
-var elementos = document.querySelectorAll("#repositorio .elemento");
+const elementos = Array.from(document.querySelectorAll('#repositorio .elemento'));
+let repositorioactivo = 0;
 
-// Añadir tooltip con nombre del color
-elementos.forEach(function(elemento) {
-    elemento.setAttribute('title', elemento.style.background);
-});
-
-// Restaurar el comportamiento original del scroll
-document.addEventListener("wheel", function(event) {
-    event.preventDefault(); // Prevenir scroll de página
+function actualizarColorActivo(index) {
+    // Asegurar que el índice sea válido (circular)
+    repositorioactivo = ((index % elementos.length) + elementos.length) % elementos.length;
     
-    elementos.forEach(function(elemento) {
-        elemento.classList.remove("activo");
+    // Remover clase activo de todos los elementos
+    elementos.forEach(el => el.classList.remove('activo'));
+    
+    // Agregar clase activo al elemento seleccionado
+    elementos[repositorioactivo].classList.add('activo');
+    
+    // Actualizar el color activo global y hacer scroll
+    const elementoActivo = elementos[repositorioactivo];
+    window.colorActivo = elementoActivo.dataset.color;
+    
+    elementoActivo.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
     });
-    
-    if(event.deltaY > 0) {
-        repositorioactivo++;
-    } else {
-        repositorioactivo--;
-    }
-    
-    if(repositorioactivo >= elementos.length) {
-        repositorioactivo = 0;
-    }
-    if(repositorioactivo < 0) {
-        repositorioactivo = elementos.length-1;
-    }
-    
-    elementos[repositorioactivo].classList.add("activo");
-    
-    // Scroll suave usando transform
-    const contenedor = document.querySelector("#repositorio #contenedor");
-    const elementWidth = 54; // ancho del elemento + margen
-    const offset = repositorioactivo * elementWidth;
-    const maxScroll = (elementos.length * elementWidth) - contenedor.parentElement.offsetWidth;
-    
-    contenedor.style.transform = `translateX(-${Math.min(offset, maxScroll)}px)`;
-});
+}
 
-// Mantener la selección por clic
+// Inicializar
+actualizarColorActivo(0);
+
+// Manejar scroll globalmente en lugar de solo en el repositorio
+document.addEventListener('wheel', function(e) {
+    // No interceptar el scroll si estamos sobre elementos que necesitan scroll
+    const target = e.target;
+    if (target.classList.contains('needs-scroll')) {
+        return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const direction = e.deltaY > 0 ? 1 : -1;
+    actualizarColorActivo(repositorioactivo + direction);
+}, { passive: false });
+
+// Manejar clicks
 elementos.forEach((elemento, index) => {
-    elemento.addEventListener('click', () => {
-        elementos.forEach(el => el.classList.remove("activo"));
-        elemento.classList.add("activo");
-        repositorioactivo = index;
-    });
+    elemento.addEventListener('click', () => actualizarColorActivo(index));
 });
+
+// Hacer que el scroll funcione incluso cuando el juego está bloqueado
+document.addEventListener('pointerlockchange', function() {
+    if (document.pointerLockElement) {
+        // Cuando el puntero está bloqueado, usar las teclas Q y E para cambiar colores
+        document.addEventListener('keydown', function(e) {
+            if (e.key.toLowerCase() === 'q') {
+                actualizarColorActivo(repositorioactivo - 1);
+            } else if (e.key.toLowerCase() === 'e') {
+                actualizarColorActivo(repositorioactivo + 1);
+            }
+        });
+    }
+});
+
+// Exportar variables necesarias
+window.elementos = elementos;
+window.repositorioactivo = repositorioactivo;

@@ -22,16 +22,22 @@
     <style>
     	<?php include "estilo/estilo.css"?>
     </style>
+    <script src="sistemas/audio-system.js"></script>
+    <!-- Agregar FontAwesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   </head>
   <body>
     <div id="instruction">Click para entrar en el juego</div>
     <?php include "componentes/login/login.php"; ?>
+    
+    <!-- Agregar el menú de objetos -->
+    <?php include "componentes/objetos/objetos.php"; ?>
 	 
     <a-scene 
     shadow="type: pcfsoft" 
     physics="gravity: -9.8;"  
-    fog="type: linear; color: #E3F2FD; near: 10; far: 50" 
-    >
+    fog="type: linear; color: #001428; near: 5; far: 30"
+    ambient-audio>
    <!--  -->
       <a-assets>
       <?php
@@ -52,16 +58,21 @@
       </a-assets>
 
 
-      <a-sky src="#cielo" material="fog: false;"></a-sky>
+      <!-- Cielo nocturno -->
+      <a-sky color="#001428"></a-sky>
 
+      <!-- Iluminación nocturna -->
       <a-entity
-        light="type: directional; intensity: 1; castShadow: true"
+        light="type: directional; intensity: 0.2; castShadow: true"
         position="10 15 10"
       ></a-entity>
 
       <a-entity
-        light="type: ambient; intensity: 0.3"
+        light="type: ambient; intensity: 0.1; color: #4466aa"
       ></a-entity>
+
+      <!-- Sistema de nieve -->
+      <a-entity snow-system></a-entity>
 
       <a-entity
         id="player"
@@ -88,6 +99,18 @@
     <?php include "componentes/guardar/guardar.php"; ?>
     
     <?php include "componentes/repositorio/repositorio.php"; ?>
+
+    <!-- Incluir el sistema de nieve -->
+    <script src="sistemas/snow-system.js"></script>
+    <script>
+        // Añadir monitoreo de objetos globales
+        setInterval(() => {
+            console.log("Estado actual:", {
+                objetoSeleccionado: window.objetoSeleccionado,
+                estructurasDisponibles: Object.keys(window.estructuras || {})
+            });
+        }, 5000);
+    </script>
   </body>
 </html>
 

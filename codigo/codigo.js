@@ -237,25 +237,32 @@ function createBox(position, id, material) {
   caja.setAttribute("identificador", `${position}`); // Use position as the unique identifier
   caja.setAttribute("shadow", "cast: true; receive: true");
 
-  // Single 'click' event, check which mouse button was used
+  // Modificar la función de click en createBox
   caja.addEventListener("click", function (evt) {
-    // Must have pointerEvent to see which button was pressed
     const mouseEvent = evt.detail.mouseEvent;
-
     if (!mouseEvent) return;
 
-    // LEFT-CLICK -> remove block
     if (mouseEvent.button === 0) {
+        // Click izquierdo - eliminar
+        removeSphereOfBoxes(evt.detail.intersection.point);
+    } else if (mouseEvent.button === 2) {
+        // Click derecho - construir
+        const point = evt.detail.intersection.point;
+        const pos = {
+            x: Math.floor(point.x),
+            y: Math.floor(point.y + 1), // Construir encima del bloque
+            z: Math.floor(point.z)
+        };
 
-      removeSphereOfBoxes(evt.detail.intersection.point);
-    }
-    // RIGHT-CLICK -> create new block adjacent
-    else if (mouseEvent.button === 2) {
+        console.log("Click derecho en posición:", pos);
+        console.log("Modo actual:", window.objetoSeleccionado);
 
-
-
-
-      createSphereOfBoxes(evt.detail.intersection.point, elementos[repositorioactivo].style.background);
+        if (window.objetoSeleccionado === 'libre') {
+            createSphereOfBoxes(point, elementos[repositorioactivo].style.backgroundColor);
+        } else if (window.estructuras && window.estructuras[window.objetoSeleccionado]) {
+            console.log("Intentando crear estructura:", window.objetoSeleccionado);
+            window.estructuras[window.objetoSeleccionado](pos);
+        }
     }
   });
 
@@ -264,6 +271,8 @@ function createBox(position, id, material) {
 
 // Function to create a sphere of boxes
 function createSphereOfBoxes(centerPoint, material) {
+  const colorToUse = window.colorActivo || material;
+  
   for (let dx = -SPHERE_RADIUS; dx <= SPHERE_RADIUS; dx++) {
     for (let dy = -SPHERE_RADIUS; dy <= SPHERE_RADIUS; dy++) {
       for (let dz = -SPHERE_RADIUS; dz <= SPHERE_RADIUS; dz++) {
@@ -283,7 +292,7 @@ function createSphereOfBoxes(centerPoint, material) {
         if (existingBlock) continue; // Skip if a block already exists
 
         // Create new box
-        createBox(`${newPos.x} ${newPos.y} ${newPos.z}`, memoria.length, material);
+        createBox(`${newPos.x} ${newPos.y} ${newPos.z}`, memoria.length, colorToUse);
 
         // Store in memory
         memoria.push({
@@ -291,7 +300,7 @@ function createSphereOfBoxes(centerPoint, material) {
           x: newPos.x / BOX_SIZE,
           y: newPos.y / BOX_SIZE,
           z: newPos.z / BOX_SIZE,
-          mat: material,
+          mat: colorToUse,
         });
         localStorage.setItem("memoria", JSON.stringify(memoria));
       }

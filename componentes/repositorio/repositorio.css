@@ -1,81 +1,118 @@
 #repositorio {
-    position: absolute;
-    bottom: 30px;
+    position: fixed;
+    bottom: 20px;
     left: 50%;
-    width: 600px;
-    height: 64px;  /* Altura ajustada para una fila de colores */
-    margin-left: -300px;
-    background: rgba(255, 255, 255, 0.95);
+    width: 80%;
+    max-width: 1400px;
+    height: 70px;
+    transform: translateX(-50%);
+    background: linear-gradient(145deg, #ffffff, #f5f7fa);
     z-index: 1000;
-    padding: 10px;
-    overflow: hidden;  /* Cambiado de overflow-y */
-    border: none;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    border-radius: 20px;
+    padding: 10px 20px;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(47, 128, 237, 0.2);
     backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+#repositorio:hover {
+    box-shadow: 0 8px 25px rgba(47, 128, 237, 0.25);
+    transform: translateX(-50%) translateY(-2px);
 }
 
 #repositorio #contenedor {
     position: relative;
-    display: block; /* Cambiado de flex a block */
-    white-space: nowrap; /* Mantiene los elementos en una línea */
-    transition: transform 0.3s ease; /* Cambiado de top a transform */
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow-x: auto;
+    padding: 0 10px;
+}
+
+#repositorio #contenedor::-webkit-scrollbar {
+    height: 4px;
+}
+
+#repositorio #contenedor::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 2px;
+}
+
+#repositorio #contenedor::-webkit-scrollbar-thumb {
+    background: #2f80ed;
+    border-radius: 2px;
 }
 
 #repositorio .elemento {
     width: 50px;
     height: 50px;
-    flex-shrink: 0;  /* Evita que los elementos se compriman */
-    box-sizing: border-box;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    display: inline-block;
     border-radius: 8px;
-    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
+    cursor: pointer;
     position: relative;
-    margin: 2px;
+    border: 3px solid transparent;
 }
 
 #repositorio .elemento:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 #repositorio .activo {
-    border: 3px solid #1976D2;
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(25, 118, 210, 0.3);
+    border: 3px solid #2f80ed;
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px white, 0 4px 8px rgba(47, 128, 237, 0.3);
+}
+
+#repositorio .activo:hover {
+    transform: scale(1.15);
+}
+
+#repositorio .elemento.activo {
+    border-color: #2f80ed;
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(47, 128, 237, 0.4);
     z-index: 1;
 }
 
-#repositorio:before {
-    content: 'Colores';
+#repositorio .elemento.activo::after {
+    content: '';
     position: absolute;
-    top: -30px;
-    left: 20px;
-    color: white;
-    font-size: 14px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid #2f80ed;
+    border-radius: 10px;
+    animation: pulse 1.5s infinite;
 }
 
-/* Scrollbar personalizada */
-#repositorio::-webkit-scrollbar {
-    width: 8px;
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
 }
 
-#repositorio::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-
-#repositorio::-webkit-scrollbar-thumb {
-    background: #1976D2;
-    border-radius: 4px;
-}
-
-/* Eliminar los estilos de grid y flex que estuvieran causando conflicto */
-#repositorio #contenedor {
-    grid-template-columns: initial;
-    flex-wrap: initial;
-    gap: initial;
+/* Indicador de color actual en el centro de la pantalla */
+.color-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+    pointer-events: none;
+    z-index: 9999;
 }
